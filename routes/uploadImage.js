@@ -22,8 +22,31 @@ const router = express.Router();
 // - 輸出：200 + { filename: file.originalFilename, sizeKB: Math.round(file.size / 1024), savedPath: file.filepath }，或 400 + { error: 'No file uploaded' }（沒帶 image）
 // - 提示：建立 formidable 實例（uploadDir、keepExtensions: true、maxFileSize），用 form.parse(req, (err, fields, files) => { ... }) 解析，其中 err 不為 null 時回 500 + { error: err.message }
 // - 注意：formidable v3 的 files.image 為陣列，需以 Array.isArray 判斷並取 [0]
-/* 作答區
-router.METHOD('PATH', (req, res) => { ... });
-*/
+
+router.post('/', (req, res) => {
+  const form = formidable({
+    uploadDir,
+    keepExtensions: true,
+    maxFileSize,
+  });
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const imageFile = Array.isArray(files.image) ? files.image[0] : files.image;
+
+    if (!imageFile) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    res.status(200).json({
+      filename: imageFile.originalFilename,
+      sizeKB: Math.round(imageFile.size / 1024),
+      savedPath: imageFile.filepath,
+    });
+  });
+});
 
 module.exports = router;
