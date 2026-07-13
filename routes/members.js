@@ -32,9 +32,13 @@ function filterByQuery(list, query) {
 // - 驗證失敗 → { valid: false, error: '缺 name 或 level' }
 // - 任務三的 POST / 會使用到這個函式
 function validateBody(body) {
-  if (!body.name || !body.level) {
-    return { valid: false, error: '缺 name 或 level' };
+  if (!body?.name || !body?.level) {
+    return {
+      valid: false,
+      error: '缺 name 或 level',
+    };
   }
+
   return { valid: true };
 }
 
